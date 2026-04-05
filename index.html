@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>nandiky.com</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #000;
+    overflow: hidden;
+    color: #fff;
+}
+
+/* ===== Vídeo de fundo ===== */
+#video-fundo,
+#video-principal {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+    transition: opacity .6s ease;
+}
+
+#video-fundo {
+    opacity: .7;
+}
+
+#video-principal {
+    opacity: 0;
+    z-index: -1;
+}
+
+/* ===== Partículas ===== */
+#particulas {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+}
+
+/* ===== Popup ===== */
+.popup {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0);
+    z-index: 1000;
+}
+
+.popup-conteudo {
+    background: rgba(20, 20, 30, 0.85);
+    padding: 50px 60px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+/* ===== Botão ===== */
+.botao-ok {
+    padding: 18px 50px;
+    font-size: 18px;
+    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+/* ===== Controles de música ===== */
+.controles-musica {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+}
+
+.controles-musica button {
+    padding: 10px 18px;
+    border-radius: 25px;
+    border: none;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== Vídeos ===== -->
+<video id="video-fundo" autoplay muted loop>
+    <source src="main.mp4" type="video/mp4">
+</video>
+
+<video id="video-principal" muted>
+    <source src="0118.mp4" type="video/mp4">
+</video>
+
+<!-- ===== Áudio ===== -->
+<audio id="musica" preload="auto">
+    <source src="0115.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ===== Partículas ===== -->
+<div id="particulas"></div>
+
+<!-- ===== Popup ===== -->
+<div class="popup" id="popup">
+    <div class="popup-conteudo">
+        <button class="botao-ok" onclick="iniciarExperiencia()">
+            INICIAR
+        </button>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+<script>
+const videoFundo = document.getElementById('video-fundo');
+const videoPrincipal = document.getElementById('video-principal');
+const musica = document.getElementById('musica');
+const popup = document.getElementById('popup');
+const controles = document.getElementById('controles');
+
+let tocando = false;
+let intervaloSync;
+
+/* ===== Iniciar ===== */
+function iniciarExperiencia() {
+
+    popup.style.display = 'none';
+
+    videoFundo.style.opacity = '0.3';
+    videoPrincipal.style.opacity = '1';
+
+    Promise.all([
+        videoPrincipal.play(),
+        musica.play()
+    ]);
+
+    controles.style.display = 'block';
+
+    tocando = true;
+    iniciarSincronizacao();
+}
+
+/* ===== Sincronizar áudio e vídeo ===== */
+function iniciarSincronizacao() {
+    clearInterval(intervaloSync);
+
+    intervaloSync = setInterval(() => {
+        if (!tocando) return;
+
+        let diferenca = Math.abs(videoPrincipal.currentTime - musica.currentTime);
+
+        if (diferenca > 0.8) {
+            musica.currentTime = videoPrincipal.currentTime;
+        }
+    }, 300);
+}
+
+/* ===== Partículas ===== */
+particlesJS("particulas", {
+    particles: {
+        number: { value: 30 },
+        size: { value: 3 },
+        move: { speed: 1 }
+    }
+});
+
+/* ===== Loop ===== */
+videoPrincipal.addEventListener('ended', () => {
+    videoPrincipal.currentTime = 0;
+    musica.currentTime = 0;
+
+    videoPrincipal.play();
+    musica.play();
+});
+</script>
+/*NANDIKY AMA JAPONESA*/
+</body>
+</html>
